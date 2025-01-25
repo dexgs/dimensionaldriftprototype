@@ -82,15 +82,20 @@ public class Player: MonoBehaviour, DimensionSwitcher.DimensionSwitch {
         Vector3 closestGroundContact = Vector3.positiveInfinity;
         float closestDistance = Mathf.Infinity;
         foreach (Collision collision in stayCollisions) {
+            Vector3 averagePoint = Vector3.zero;
+            int numPoints = 0;
             foreach (ContactPoint contact in collision.contacts) {
                 if (Vector3.Dot(contact.normal, gravity.normalized) > 0.7f) {
                     isGrounded = true;
-                    float distance = (contact.point - transform.position).sqrMagnitude;
-                    if (distance < closestDistance) {
-                        closestDistance = distance;
-                        closestGroundContact = contact.point;
-                    }
+                    averagePoint += contact.point;
+                    numPoints++;
                 }
+            }
+            averagePoint /= numPoints;
+            float distance = (averagePoint - transform.position).sqrMagnitude;
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closestGroundContact = averagePoint;
             }
         }
         stayCollisions.Clear();
